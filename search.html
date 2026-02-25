@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Routes | KMB Tracker</title>
+    <link rel="stylesheet" href="search.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="navbar">
+            <div class="logo">KMB TRACKER</div>
+            <nav>
+                <a href="home.html" class="nav-link">Home</a>
+                <a href="search.html" class="nav-link active">Search</a>
+                <a href="watchlist.html" class="nav-link">Watchlist</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="search-page-container">
+        <section class="search-hero-box">
+            <div class="hero-inner">
+                <h1>Explore Destinations</h1>
+                <p>Real-time bus data at your fingertips</p>
+                
+                <div class="search-bar-container">
+                    <div class="search-input-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input 
+                            type="text" 
+                            id="routeInput" 
+                            list="destinationList" 
+                            placeholder="Select or Type Route..."
+                            autocomplete="off"
+                        >
+                    </div>
+                    <button id="searchBtn" class="search-button">Search</button>
+                    
+                    <datalist id="destinationList">
+                        <option value="1A">Tsim Sha Tsui (1A)</option>
+                        <option value="6">Mong Kok (6)</option>
+                        <option value="960">Wan Chai (960)</option>
+                        <option value="89">Kwun Tong (89)</option>
+                        <option value="B1">Lok Ma Chau (B1)</option>
+                        <option value="215X">Kowloon Station (215X)</option>
+                        <option value="277X">Luen Wo Hui (277X)</option>
+                        <option value="968">Causeway Bay (968)</option>
+                        <option value="74X">Tai Po Central (74X)</option>
+                        <option value="58X">Mong Kok East (58X)</option>
+                        <option value="101">Kennedy Town (101)</option>
+                        <option value="290">Tsuen Wan West (290)</option>
+                        <option value="5R">Kai Tak Cruise Terminal (5R)</option>
+                        <option value="87D">Hung Hom Station (87D)</option>
+                        <option value="269C">Tin Shui Wai (269C)</option>
+                        <option value="681">Ma On Shan (681)</option>
+                        <option value="978">Wan Chai North (978)</option>
+                        <option value="307">Central Ferry Piers (307)</option>
+                        <option value="E33">Airport (E33)</option>
+                        <option value="234X">Tsim Sha Tsui East (234X)</option>
+                    </datalist>
+                </div>
+
+                <div class="popular-chips">
+                    <span>Try searching:</span>
+                    <button class="chip" onclick="fillAndSearch('1A')">1A</button>
+                    <button class="chip" onclick="fillAndSearch('960')">960</button>
+                    <button class="chip" onclick="fillAndSearch('89')">89</button>
+                </div>
+            </div>
+        </section>
+
+        <div id="resultsContainer"></div>
+    </main>
+
+    <script src="search.js"></script>
+</body>
+</html>
