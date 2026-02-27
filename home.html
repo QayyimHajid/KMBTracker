@@ -10,6 +10,7 @@
   <header>
     <div class="navbar">
       <div class="logo">KMB TRACKER</div>
+      <div id="clock" style="color: white; font-weight: bold; font-family: 'Consolas', monospace;">Loading time...</div>
       <nav>
         <a href="home.html" class="nav-link active">Home</a>
         <a href="search.html" class="nav-link">Search</a>
@@ -21,33 +22,53 @@
   <main>
     <section class="hero">
       <h1>Discover Your Next Stop</h1>
-      <p>Explore major destinations across Hong Kong with real-time KMB data.</p>
+      <p>Explore major destinations across Hong Kong with curated geographic data.</p>
     </section>
 
     <section class="destinations-section">
-      <h2 class="section-title">Popular Destinations</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 class="section-title" style="margin: 0;">Popular Destinations</h2>
+      </div>
       
       <div class="genre-nav" id="destinationFilter">
-        <button class="genre-btn" data-region="top">🔥 Top</button>
-        <button class="genre-btn active" data-region="all">All Regions</button>
-        <button class="genre-btn" data-region="Kowloon">Kowloon</button>
-        <button class="genre-btn" data-region="NT">New Territories</button>
-        <button class="genre-btn" data-region="Hong Kong">Hong Kong Island</button>
+        <button class="genre-btn" onclick="applyFilter(this, 'top')">🔥 Top</button>
+        <button class="genre-btn active" onclick="applyFilter(this, 'all')">All Regions</button>
+        <button class="genre-btn" onclick="applyFilter(this, 'Kowloon')">Kowloon</button>
+        <button class="genre-btn" onclick="applyFilter(this, 'NT')">New Territories</button>
+        <button class="genre-btn" onclick="applyFilter(this, 'Hong Kong')">Hong Kong Island</button>
       </div>
 
       <div id="topCollections" class="book-grid">
-          </div>
+        </div>
     </section>
   </main>
 
   <div id="detailModal" class="modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); align-items: center; justify-content: center;">
     <div class="modal-content" style="background:#fff; width: 450px; border-radius: 20px; position: relative; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); text-align: center;">
       <span class="close-btn" onclick="document.getElementById('detailModal').style.display='none'" style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #666;">&times;</span>
+      
       <div id="modalBody">
           </div>
     </div>
   </div>
 
   <script src="homeRenderer.js"></script>
+
+  <script>
+    // Simple helper to switch active button styles
+    function applyFilter(btn, region) {
+        // Remove active class from all buttons in the filter row
+        const buttons = document.querySelectorAll('.genre-btn');
+        buttons.forEach(b => b.classList.remove('active'));
+        
+        // Add active class to clicked button
+        btn.classList.add('active');
+        
+        // Call the render function in homeRenderer.js
+        if (typeof renderGrid === 'function') {
+            renderGrid(region);
+        }
+    }
+  </script>
 </body>
 </html>
