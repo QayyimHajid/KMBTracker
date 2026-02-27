@@ -1,96 +1,105 @@
+/**
+ * watchlist.js - CRUD Controller for Saved Routes
+ * Handles the 'Read', 'Update', and 'Delete' operations by communicating 
+ * with the Main process via IPC.
+ */
+
 const { ipcRenderer } = require('electron');
 
-document.addEventListener('DOMContentLoaded', () => {
-    init();
-    // Connect the refresh button to the init function
-    const refreshBtn = document.getElementById('refreshBtn');
-    if (refreshBtn) refreshBtn.onclick = () => init();
-});
-
-// READ: Reads watchlist data from system local memory to display saved routes
-async function init() {
+/**
+ * CRUD: READ OPERATION
+ * Fetches the saved routes from the JSON database and renders them as UI components.
+ */
+async function loadWatchlist() {
     const container = document.getElementById('bookmarksList');
     const emptyMsg = document.getElementById('emptyMsg');
     
-    if (!container) return;
-    container.innerHTML = ""; // Clear existing cards before reload
+    // VISUAL FEEDBACK: Show loading state while reading the file system
+    container.innerHTML = '<div class="no-service-box"><div class="spinner"></div><p>Syncing with watchlist.json...</p></div>';
 
-    const list = await ipcRenderer.invoke('watchlist-get');
-    
-    if (list && list.length > 0) {
-        if (emptyMsg) emptyMsg.style.display = 'none';
-        
-        // Loop through each saved item to create its UI card
-        for (const item of list) {
-            const card = await createRouteCard(item);
-            container.appendChild(card);
-        }
-    } else {
-        if (emptyMsg) emptyMsg.style.display = 'block';
+    // Invoke the 'get-watchlist' handler in main.js
+    const list = await ipcRenderer.invoke('get-watchlist');
+
+    if (!list || list.length === 0) {
+        emptyMsg.style.display = 'block';
+        container.innerHTML = '';
+        return;
     }
+
+    emptyMsg.style.display = 'none';
+    container.innerHTML = ''; // Clear spinner
+
+    // DATA MAPPING: Converting JSON objects into HTML Card Elements
+    list.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'result-card'; 
+        
+        div.innerHTML = `
+            <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="background: #3DBD7A; color: white; padding: 5px 12px; border-radius: 8px; font-weight: 900; font-size: 1.2rem;">
+                        ${item.route}
+                    </span>
+                    <strong style="font-size: 1.1rem; color: #333;">to ${item.name}</strong>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="font-size: 0.8rem; color: #888; display: block; margin-bottom: 5px;">Travel Notes:</label>
+                    <input type="text" id="note-${item._id}" value="${item.note || ''}" 
+                           placeholder="e.g. Morning commute" 
+                           style="width: 85%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem;">
+                </div>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-left: 20px;">
+                <button onclick="saveNote('${item._id}')" 
+                        style="background: #3DBD7A; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    Update Note
+                </button>
+                <button onclick="deleteItem('${item._id}')" 
+                        style="background: #ff4d4d; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    Remove
+                </button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
 }
 
-async function createRouteCard(item) {
-    const card = document.createElement('div');
-    card.className = 'bookmark-row';
+/**
+ * CRUD: UPDATE OPERATION
+ * Captures the user's input from the text field and updates the specific 
+ * object in watchlist.json using its unique ID.
+ */
+window.saveNote = async (id) => {
+    const note = document.getElementById(`note-${id}`).value;
+    const success = await ipcRenderer.invoke('update-watchlist', { id, note });
     
-    let etaHtml = 'Checking for buses...';
-    let themeColor = '#3DBD7A'; 
+    if (success) {
+        alert("ℹ️ UPDATE: Note successfully saved to watchlist.json!");
+    } else {
+        alert("❌ Error: Could not update note.");
+    }
+};
 
-    try {
-        const res = await ipcRenderer.invoke('kmb-api-fetch-eta', item.route);
-        const now = new Date();
-        const validEtas = (res.data || [])
-            .filter(b => b.eta && new Date(b.eta) > now)
-            .sort((a, b) => new Date(a.eta) - new Date(b.eta));
-
-        if (validEtas.length > 0) {
-            etaHtml = validEtas.slice(0, 2).map((bus, i) => {
-                const diff = Math.floor((new Date(bus.eta) - now) / 60000);
-                return `<div style="margin-bottom:5px;">${i === 0 ? '<strong>Next:</strong>' : 'Following:'} ${diff === 0 ? 'Arriving' : diff + ' mins'}</div>`;
-            }).join('');
-        } else {
-            etaHtml = 'Service ended.';
+/**
+ * CRUD: DELETE OPERATION
+ * Removes the selected route from the JSON database.
+ */
+window.deleteItem = async (id) => {
+    // Confirmation dialog to prevent accidental deletion (Standard UX practice)
+    if (confirm("Are you sure you want to remove this route from your watchlist?")) {
+        const success = await ipcRenderer.invoke('delete-watchlist', id);
+        if (success) {
+            alert("⚠️ DELETE: Route removed from watchlist.");
+            loadWatchlist(); // Immediate UI refresh after data change
         }
-    } catch (e) { etaHtml = 'API Error'; }
+    }
+};
 
-    card.innerHTML = `
-        <div class="route-badge">${item.route}</div>
-        <div class="row-info">
-            <div style="display:flex; justify-content:space-between;">
-                <h3 style="margin:0;">To: ${item.dest_en}</h3>
-                <span style="color:${themeColor}; font-weight:bold; font-size:12px;">● ACTIVE</span>
-            </div>
-            <div class="eta-box">${etaHtml}</div>
-            <textarea class="note-input" placeholder="Add a travel note...">${item.note || ''}</textarea>
-            <div class="row-actions">
-                <button class="save-btn" style="background:#3DBD7A; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Update Note</button>
-                <button class="remove-btn" style="background:#ff4d4d; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Remove</button>
-            </div>
-        </div>
-    `;
-
-    // UPDATE Implementation: Saves the note to local memory
-    const saveBtn = card.querySelector('.save-btn');
-    const noteInput = card.querySelector('.note-input');
-
-    saveBtn.addEventListener('click', async () => {
-        const note = noteInput.value.trim(); 
-        await ipcRenderer.invoke('watchlist-update', { id: item._id, note });
-        alert("Note Saved!");
-    });
-
-    // DELETE Implementation: Removes the route from memory and UI
-    const removeBtn = card.querySelector('.remove-btn');
-
-    removeBtn.addEventListener('click', async () => {
-        // Verification: Pop-up ensures user intent before deleting
-        if (confirm("Are you sure you want to remove this route?")) {
-            const res = await ipcRenderer.invoke('watchlist-remove', item._id);
-            // UI Sync: Removes the card from the view immediately if successful
-            if (res.success) card.remove();
-        }
-    });
-
-    return card;
-}
+// INITIALIZATION: Setup event listeners and initial data fetch
+document.addEventListener('DOMContentLoaded', () => {
+    loadWatchlist();
+    const refreshBtn = document.getElementById('refreshBtn');
+    if (refreshBtn) refreshBtn.onclick = loadWatchlist;
+});
