@@ -1,6 +1,12 @@
+/**
+ * homeRenderer.js - Logic for the Discover/Home Page
+ * Handles dynamic grid generation, regional filtering, and modal interactions.
+ */
+
 const { ipcRenderer } = require('electron');
 
-// 1. Array now includes Latitude and Longitude
+// 1. DATA SOURCE: Local array containing geographic data for major KMB terminals.
+// This serves as the 'Hardcoded Dataset' for the Discovery feature.
 const destinations = [
     { id: '1A', route: '1A', name: 'Tsim Sha Tsui', region: 'Kowloon', top: true, lat: 22.2988, lng: 114.1742 },
     { id: '6', route: '6', name: 'Mong Kok', region: 'Kowloon', top: true, lat: 22.3193, lng: 114.1694 },
@@ -24,28 +30,48 @@ const destinations = [
     { id: '234X', route: '234X', name: 'Tsim Sha Tsui East', region: 'Kowloon', top: false, lat: 22.2985, lng: 114.1775 }
 ];
 
+// INITIALIZATION: Runs once the HTML document is fully parsed.
 document.addEventListener('DOMContentLoaded', () => {
-    renderGrid('all');
+    renderGrid('all'); // Default view shows all routes
+    
+    // UI Feature: A live clock updated every second for user convenience
     setInterval(() => {
         const clock = document.getElementById('clock');
         if (clock) clock.innerText = new Date().toLocaleTimeString();
     }, 1000);
 });
 
+/**
+ * CORE LOGIC: Filters and Renders the bus route cards.
+ * @param {string} filter - The filter category (all, top, or region name).
+ */
 function renderGrid(filter) {
     const grid = document.getElementById('topCollections');
     if (!grid) return;
-    grid.innerHTML = '';
-    destinations.filter(d => filter === 'all' || d.region === filter || (filter === 'top' && d.top)).forEach(dest => {
-        const div = document.createElement('div');
-        div.className = 'destination-card';
-        // Note: Changed function name here to showInfo to avoid confusion with live predictions
-        div.innerHTML = `<h3>${dest.route}</h3><p>${dest.name}</p><button onclick="showInfo('${dest.route}')">View Info</button>`;
-        grid.appendChild(div);
-    });
+    
+    grid.innerHTML = ''; // Clear current grid before re-rendering
+    
+    // Filtering logic based on user selection
+    destinations
+        .filter(d => filter === 'all' || d.region === filter || (filter === 'top' && d.top))
+        .forEach(dest => {
+            const div = document.createElement('div');
+            div.className = 'destination-card';
+            
+            // Injecting HTML for the bus stop visual and action button
+            div.innerHTML = `
+                <h3>${dest.route}</h3>
+                <p>${dest.name}</p>
+                <button onclick="showInfo('${dest.route}')">View Info</button>
+            `;
+            grid.appendChild(div);
+        });
 }
 
-// 2. Swapped for showInfo - No API fetch required!
+/**
+ * UI INTERACTION: Opens the Modal and displays static geographic data.
+ * This demonstrates the ability to pass object properties to a GUI component.
+ */
 window.showInfo = (route) => {
     const modal = document.getElementById('detailModal');
     const body = document.getElementById('modalBody');
@@ -53,9 +79,9 @@ window.showInfo = (route) => {
 
     if (!dest) return;
 
-    modal.style.display = 'flex';
+    modal.style.display = 'flex'; // Reveal modal using Flexbox centering
     
-    // This displays coordinates immediately from the array above
+    // Injecting dynamic route data into the modal window
     body.innerHTML = `
         <div style="color: #333; text-align: left;">
             <h2 style="color: #3DBD7A; margin-top: 0;">Route ${dest.route}</h2>
@@ -67,7 +93,7 @@ window.showInfo = (route) => {
                 Long: ${dest.lng}
             </div>
             <div style="margin: 20px 0;">
-                <a href="https://www.google.com/maps?q=${dest.lat},${dest.lng}" 
+                <a href="https://www.google.com/maps/search/?api=1&query=${dest.lat},${dest.lng}" 
                    target="_blank" 
                    style="display: block; text-align: center; background: #4285F4; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold;">
                    📍 View on Google Maps
@@ -81,8 +107,12 @@ window.showInfo = (route) => {
     `;
 };
 
+/**
+ * CRUD OPERATION (CREATE): Invokes the IPC bridge to save data to watchlist.json.
+ */
 window.saveRoute = async (route, name) => {
+    // Communicate with main process to write to file
     await ipcRenderer.invoke('add-to-watchlist', { route, name });
-    alert("✅ CREATE: Saved to watchlist.json!");
+    alert("✅ SUCCESS: Saved to your local watchlist!");
     document.getElementById('detailModal').style.display = 'none';
 };
