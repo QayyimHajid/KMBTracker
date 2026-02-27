@@ -1,36 +1,36 @@
-/* style.css - KMB Tracker - Layout & Theme Preserved from Template */
+/**
+ * index.css - Global Stylesheet for KMB Tracker
+ * Defines the color palette, typography, and responsive grid system.
+ */
 
-:root{
-  --teal-green: #3DBD7A; /* Primary Brand Color */
-  --lemon-chiffon: #FFFACD; /* Background Tint */
+:root {
+  /* BRAND COLORS: Consistent with KMB's green identity */
+  --teal-green: #3DBD7A; 
+  --lemon-chiffon: #FFFACD; /* Soft yellow background for readability */
   --light-teal: #E8F5E9;
   --dark-teal: #2E8B57;
+  
+  /* UI VARIABLES: Standardizing spacing and borders */
   --bg: var(--lemon-chiffon);
   --card: #ffffff;
   --muted: #6b7280;
   --accent: var(--teal-green);
   --border: #d1e7dd;
-  --radius: 10px;
-  --pad: 14px;
+  --radius: 15px;
   font-family: 'Segoe UI', Inter, system-ui, sans-serif;
 }
 
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  background:var(--bg);
-  color:#111827;
-  -webkit-font-smoothing:antialiased;
-  padding:24px;
+* { box-sizing: border-box; } /* Ensuring padding doesn't affect element width */
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: #111827;
+  -webkit-font-smoothing: antialiased;
+  padding: 24px;
 }
 
-/* 🌐 NAVBAR - Maintained exact single-line layout */
-header{
-  max-width:1100px;
-  margin:0 auto 18px;
-}
-
+/* 🌐 NAVIGATION BAR STYLING */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -38,241 +38,96 @@ header{
   background: var(--teal-green);
   padding: 12px 24px;
   border-radius: var(--radius);
-  box-shadow: 0 4px 10px rgba(61, 189, 122, 0.08);
+  box-shadow: 0 4px 10px rgba(61, 189, 122, 0.2);
   margin-bottom: 20px;
-  border: 1px solid var(--border);
-}
-
-.navbar .logo {
-  font-weight: 700;
-  font-size: 18px;
-  color: white;
-  letter-spacing: 0.3px;
-}
-
-.navbar nav {
-  display: flex;
-  gap: 18px;
-}
-
-.navbar .nav-link {
-  text-decoration: none;
-  color: rgba(255,255,255,0.9);
-  font-weight: 500;
-  transition: all 0.3s ease;
-  padding: 10px 20px;
-  border-radius: 25px;
-}
-
-.navbar .nav-link:hover {
-  color: white;
-  transform: translateY(-2px);
-  background: rgba(255,255,255,0.1);
 }
 
 .navbar .nav-link.active {
   color: var(--teal-green);
   background: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(255,255,255,0.4);
+  font-weight: bold;
 }
 
-/* 🎯 BUS GRID SYSTEM - Maintained Grid Logic */
-main{
-  max-width:1100px;
-  margin:0 auto;
-}
-
-.book-grid { 
-    display: grid; 
-    gap: 18px; 
-    align-items: start; 
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-}
-
-#topSellers.book-grid {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
-#topCollections.book-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-/* 🚍 BUS CARD - Mirroring 'Book Card' structure */
-.book-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  width: 100%;
-  min-height: 360px;
-  padding: 16px;
-  border-radius: 12px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  box-shadow: 0 6px 18px rgba(15,23,42,0.04);
-  transition: transform 0.16s ease;
-}
-
-.book-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 24px rgba(15,23,42,0.08);
-}
-
-/* Cover area (now the Bus Route Number Plate) */
-.cover-wrap {
-  width: 85%;
-  aspect-ratio: 1 / 1; 
-  border-radius: 50%; /* Circle for Bus Routes */
-  overflow: hidden;
-  box-shadow: 0 6px 18px rgba(15,23,42,0.1);
-  margin-top: 8px;
-  background: var(--teal-green); /* Bus Theme Color */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 2.5rem;
-  font-weight: 800;
-  border: 4px solid white;
-}
-
-.book-card h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin: 15px 0 5px;
-  color: #0f172a;
-}
-
-.book-card p.author {
-  margin: 0 0 14px;
-  color: var(--muted);
-  font-size: 0.88rem;
-  text-align: center;
-}
-
-/* 🔖 WATCHLIST BUTTON (Mirroring Bookmark) */
-.bookmark-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255,255,255,0.95);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--accent);
-  box-shadow: 0 4px 10px rgba(15,23,42,0.06);
-}
-
-.bookmark-btn.bookmarked {
-  background: var(--accent);
-  color: #fff;
-}
-
-/* 🔘 ACTION BUTTON */
-.read-btn {
-  margin-top: auto;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: none;
-  background: var(--accent);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.12s;
-}
-
-.read-btn:hover { background: var(--dark-teal); }
-
-/* 🎯 GENRE/REGION NAVIGATION - 100% Structural Match */
-.genre-nav {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: 20px 0;
-  padding: 16px;
-  background: var(--card);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-}
-
-.genre-btn {
-  padding: 12px 20px;
-  border: 2px solid var(--border);
-  border-radius: 50px;
-  background: var(--bg);
-  color: var(--muted);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.genre-btn.active {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
-}
-
-/* Section titles */
-.section-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 20px;
-  border-left: 5px solid var(--teal-green);
-  padding-left: 15px;
-}
-
+/* 🎯 GRID LAYOUT: Responsive grid using CSS Grid Auto-fill */
 .book-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 25px;
   padding: 20px 0;
 }
 
-.book-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-}
-
-.modal {
-    display: none; 
-    position: fixed; 
-    z-index: 9999; /* Higher than navbar */
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-}
-
+/* 🚍 DESTINATION CARD: Custom component designed to look like a bus stop sign */
 .destination-card {
-    background: #fff;
-    padding: 20px;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  background: var(--card);
+  padding: 30px 20px;
+  border-radius: var(--radius);
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  transition: all 0.3s ease; /* Smooth hover animation */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid var(--border);
 }
 
-.circle-icon {
-    background: #3DBD7A;
-    color: white;
-    width: 120px; /* Adjust based on your original size */
-    height: 120px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 15px;
-    font-size: 2rem;
-    font-weight: bold;
-    border: 8px solid #1e5631; /* The "KMB Stop" border look */
+.destination-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+}
+
+/* THE BUS CIRCLE: Circular route number display */
+.destination-card h3 {
+  background: var(--teal-green);
+  color: white;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  border: 6px solid #1e5631; /* Replicating the KMB sign border */
+}
+
+/* 🎭 MODAL WINDOW: Centered overlay for detailed information */
+.modal {
+  display: none; 
+  position: fixed; 
+  z-index: 9999; 
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  backdrop-filter: blur(5px); /* Background blur for modern GUI look */
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 20px;
+  padding: 40px;
+  animation: modalSlide 0.3s ease-out; /* Slide-up animation */
+}
+
+/* ANIMATIONS */
+@keyframes modalSlide {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* LOADING SPINNER: Visual feedback during API calls */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--teal-green);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
